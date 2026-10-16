@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<p:FatturaElettronica versione="FPR12" xmlns:p="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/fatture/v1.2">
+  <FatturaElettronicaHeader>
+    <CedentePrestatore><DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>01234567890</IdCodice></IdFiscaleIVA>
+      <Anagrafica><Denominazione>STUDIO ALFA SRL</Denominazione></Anagrafica></DatiAnagrafici></CedentePrestatore>
+    <CessionarioCommittente><DatiAnagrafici><IdFiscaleIVA><IdPaese>IT</IdPaese><IdCodice>04444444444</IdCodice></IdFiscaleIVA>
+      <Anagrafica><Denominazione>GIALLI SRL</Denominazione></Anagrafica></DatiAnagrafici></CessionarioCommittente>
+  </FatturaElettronicaHeader>
+  <FatturaElettronicaBody>
+    <DatiGenerali><DatiGeneraliDocumento><TipoDocumento>TD01</TipoDocumento><Divisa>EUR</Divisa>
+      <Data>2026-01-22</Data><Numero>14</Numero><ImportoTotaleDocumento>915.00</ImportoTotaleDocumento>
+    </DatiGeneraliDocumento></DatiGenerali>
+    <DatiBeniServizi><DatiRiepilogo><AliquotaIVA>22.00</AliquotaIVA><ImponibileImporto>750.00</ImponibileImporto><Imposta>165.00</Imposta></DatiRiepilogo></DatiBeniServizi>
+    <DatiPagamento><CondizioniPagamento>TP02</CondizioniPagamento><DettaglioPagamento><ModalitaPagamento>MP05</ModalitaPagamento>
+      <DataScadenzaPagamento>2026-02-21</DataScadenzaPagamento><ImportoPagamento>915.00</ImportoPagamento></DettaglioPagamento></DatiPagamento>
+  </FatturaElettronicaBody>
+</p:FatturaElettronica>
