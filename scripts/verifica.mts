@@ -59,6 +59,17 @@ await prova("esempio realistico: fatture pagate, acconto e fattura aperta", () =
   assert.deepEqual(stato["21/2026"], { stato: "parziale", pagato: 1464, residuo: 3416 });
   assert.equal(stato["22/2026"].stato, "aperta");
 });
+const attesoTi = JSON.parse(readFileSync(join(radice, "tipo-intesa", "atteso.json"), "utf8"));
+const ti = await carica("tipo-intesa", "estratto-maggio-2026.pdf", "07654320963");
+await prova("formato grande banca: riepilogo in testa, causali su più righe, filigrana", () => {
+  const e = ti.estratto;
+  assert.equal(e.movimenti.length, attesoTi.movimenti);
+  assert.equal(e.saldoIniziale, attesoTi.saldoIniziale);
+  assert.equal(e.saldoFinale, attesoTi.saldoFinale);
+  assert.equal(e.controlloSaldi.quadra, true);
+  assert.equal(e.periodoDa, "2026-05-01");
+  assert.ok(e.movimenti.every((m) => !/FAC-SIMILE|Estratto conto$/.test(m.descrizione)), "testo di pagina finito nelle causali");
+});
 await prova("categorie per natura della spesa", () => {
   const cat = (s: string, i = -10) => categoriaDaRegole(s, i);
   assert.equal(cat("ADDEBITO SDD UNIPOLSAI ASSICURAZIONI POLIZZA RCA FURGONE"), "Assicurazioni");

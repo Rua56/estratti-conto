@@ -6,7 +6,7 @@ import { arrotonda, parseData, parseImporto } from "./numeri";
 import type { Estratto, Movimento } from "./types";
 
 type Pezzo = { x: number; y: number; testo: string };
-type Riga = { y: number; pezzi: Pezzo[] };
+type Riga = { y: number; pagina: number; pezzi: Pezzo[] };
 
 const RE_IMPORTO = /^[-+]?\d{1,3}(\.\d{3})*,\d{2}$|^[-+]?\d+,\d{2}$/;
 const RE_IBAN = /IT\d{2}[A-Z]\d{10}[0-9A-Z]{12}/;
@@ -25,6 +25,8 @@ async function righePdf(pdf: Uint8Array): Promise<Riga[][]> {
     const pezzi: Pezzo[] = [];
     for (const item of content.items as { str?: string; transform?: number[] }[]) {
       if (!item.str?.trim() || !item.transform) continue;
+      // Testo ruotato (filigrane, scritte a margine): non fa parte dei movimenti.
+      if (Math.abs(item.transform[1]) > 0.01 || Math.abs(item.transform[2]) > 0.01) continue;
       pezzi.push({ x: item.transform[4], y: item.transform[5], testo: item.str.trim() });
     }
     // Raggruppa per riga (stessa y con tolleranza), dall'alto in basso.
@@ -33,7 +35,7 @@ async function righePdf(pdf: Uint8Array): Promise<Riga[][]> {
     for (const pz of pezzi) {
       const r = righe.find((r) => Math.abs(r.y - pz.y) < 3);
       if (r) r.pezzi.push(pz);
-      else righe.push({ y: pz.y, pezzi: [pz] });
+      else righe.push({ y: pz.y, pagina: p, pezzi: [pz] });
     }
     for (const r of righe) r.pezzi.sort((a, b) => a.x - b.x);
     pagine.push(righe);
@@ -61,9 +63,19 @@ export async function estraiConRegole(pdf: Uint8Array): Promise<Omit<Estratto, "
   let saldoFinale: number | null = null;
   const movimenti: Movimento[] = [];
   let ultimo: Movimento | null = null;
+  let rigaPrec: Riga | null = null;
+
+  // Importo che segue un'etichetta sulla stessa riga: gestisce i riepiloghi con più saldi affiancati.
+  const importoDopo = (riga: Riga, re: RegExp) => {
+    const i = riga.pezzi.findIndex((p) => re.test(p.testo));
+    const pz = i < 0 ? undefined : riga.pezzi.slice(i).find((p) => RE_IMPORTO.test(p.testo));
+    return pz ? parseImporto(pz.testo) : null;
+  };
 
   for (const riga of tutto) {
     const t = testoRiga(riga);
+    const prec = rigaPrec;
+    rigaPrec = riga;
 
     // Intestazione colonne
     const uscite = riga.pezzi.find((p) => /^(DARE|USCITE|ADDEBITI)$/i.test(p.testo));
@@ -77,13 +89,11 @@ export async function estraiConRegole(pdf: Uint8Array): Promise<Omit<Estratto, "
     }
 
     const importiRiga = riga.pezzi.filter((p) => RE_IMPORTO.test(p.testo));
-    if (/SALDO (INIZIALE|INIZIO|PRECEDENTE|AL \d)/i.test(t) && importiRiga.length) {
-      if (saldoIniziale === null) saldoIniziale = parseImporto(importiRiga.at(-1)!.testo);
-      ultimo = null;
-      continue;
-    }
-    if (/SALDO (FINALE|CONTABILE FINALE|AL TERMINE)/i.test(t) && importiRiga.length) {
-      saldoFinale = parseImporto(importiRiga.at(-1)!.testo);
+    const reIniziale = /SALDO (?:CONTABILE )?(?:INIZIALE|INIZIO|PRECEDENTE|AL \d)/i;
+    const reFinale = /SALDO (?:CONTABILE )?(?:FINALE|AL TERMINE)/i;
+    if ((reIniziale.test(t) || reFinale.test(t)) && importiRiga.length) {
+      if (reIniziale.test(t) && saldoIniziale === null) saldoIniziale = importoDopo(riga, reIniziale) ?? importoDopo(riga, /INIZIAL|PRECEDENTE|SALDO/i);
+      if (reFinale.test(t)) saldoFinale = importoDopo(riga, reFinale) ?? importoDopo(riga, /FINALE|TERMINE/i) ?? saldoFinale;
       ultimo = null;
       continue;
     }
@@ -138,7 +148,9 @@ export async function estraiConRegole(pdf: Uint8Array): Promise<Omit<Estratto, "
     }
 
     // Riga di continuazione della descrizione
-    if (ultimo && !importiRiga.length && !date.length && t.length < 120 && !/PAGINA|PAG\.\s*\d|SEGUE|TOTALE/i.test(t)) {
+    // (solo se subito sotto la riga precedente, sulla stessa pagina: esclude piè di pagina e intestazioni)
+    const attaccata = prec !== null && prec.pagina === riga.pagina && prec.y - riga.y < 16;
+    if (ultimo && attaccata && !importiRiga.length && !date.length && t.length < 120 && !/PAGINA|PAG\.\s*\d|SEGUE|TOTALE/i.test(t)) {
       ultimo.descrizione = `${ultimo.descrizione} ${t}`.trim();
     } else if (!inizia) {
       ultimo = null;
@@ -151,7 +163,7 @@ export async function estraiConRegole(pdf: Uint8Array): Promise<Omit<Estratto, "
     testo.match(/\b(?:Intesa Sanpaolo|UniCredit|BPER|Banco BPM|Poste Italiane|BancoPosta|Fineco|Mediolanum|Crédit Agricole|BNL|Monte dei Paschi|Credem|ING Bank|N26|Revolut|Banca Sella)\b/i)?.[0] ??
     testo.match(/(?:Cassa Rurale|Cassa di Risparmio|Banca Popolare|Credito Cooperativo|Banca)(?:[ \t]+[^\s\d-][^\s]*){0,2}/i)?.[0]?.trim() ??
     null;
-  const periodo = testo.match(/dal\s+(\d{2}\/\d{2}\/\d{4})\s+al\s+(\d{2}\/\d{2}\/\d{4})/i);
+  const periodo = testo.match(/dal\s+(\d{2}[\/.-]\d{2}[\/.-]\d{4})\s+al\s+(\d{2}[\/.-]\d{2}[\/.-]\d{4})/i);
 
   return {
     banca,
