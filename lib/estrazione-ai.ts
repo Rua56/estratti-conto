@@ -43,7 +43,8 @@ export function aiDisponibile(): boolean {
 
 export async function estraiConAi(pdf: Uint8Array): Promise<Omit<Estratto, "controlloSaldi">> {
   const client = new Anthropic();
-  const risposta = await client.beta.messages.parse({
+  // In streaming: con max_tokens alto l'SDK rifiuta le richieste non in streaming.
+  const stream = client.beta.messages.stream({
     model: MODELLO,
     max_tokens: 32000,
     betas: ["server-side-fallback-2026-07-01"],
@@ -63,6 +64,7 @@ export async function estraiConAi(pdf: Uint8Array): Promise<Omit<Estratto, "cont
       },
     ],
   });
+  const risposta = await stream.finalMessage();
 
   if (risposta.stop_reason === "refusal") throw new Error("Il modello ha rifiutato di elaborare il documento.");
   if (risposta.stop_reason === "max_tokens") throw new Error("Documento troppo lungo: dividilo in più file.");

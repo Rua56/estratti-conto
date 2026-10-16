@@ -16,7 +16,13 @@ export async function elabora(input: Input): Promise<Risultato & { avvisi: strin
   let base: Omit<Estratto, "controlloSaldi">;
 
   if (aiDisponibile() && !input.forzaRegole) {
-    base = await estraiConAi(input.pdf);
+    try {
+      base = await estraiConAi(input.pdf);
+    } catch (e) {
+      console.error("Lettura AI fallita, passo alle regole:", e);
+      base = await estraiConRegole(input.pdf);
+      avvisi.push("Lettura AI non riuscita: risultato ottenuto con il riconoscimento a regole.");
+    }
   } else {
     base = await estraiConRegole(input.pdf);
     if (!aiDisponibile()) avvisi.push("Lettura AI non configurata: uso il riconoscimento a regole (solo PDF digitali, non scansioni).");

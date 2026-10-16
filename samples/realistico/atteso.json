@@ -1,0 +1,12 @@
+{
+  "movimenti": 27,
+  "saldoIniziale": 9874.31,
+  "saldoFinale": 10529.99,
+  "totaleUscite": 16844.44,
+  "totaleEntrate": 17500.12,
+  "fattureAbbinabili": 6,
+  "fattureAperte": [
+    "21/2026 (solo acconto 1464)",
+    "22/2026"
+  ]
+}
