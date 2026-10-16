@@ -10,6 +10,7 @@ e gli export per Excel e prima nota.
 npm install
 npm run dev          # http://localhost:3000
 npm run prova        # prova end-to-end sugli esempi in samples/
+npm test             # controlli automatici (regole, saldi, acconti, export), senza costi AI
 ```
 
 Per la lettura con AI (necessaria per scansioni e layout insoliti) imposta la chiave:
@@ -34,6 +35,10 @@ colonne Dare/Avere (o Uscite/Entrate, Addebiti/Accrediti).
 | `lib/categorie.ts` | Piano dei conti semplificato e regole per parole chiave. |
 
 I file caricati vengono elaborati in memoria e non vengono salvati.
+
+Limiti (in `lib/limiti.ts`): 4 MB per richiesta (tetto di Vercel), 40 pagine, 15 conversioni l'ora per IP.
+Il pulsante "Prova con un esempio" usa `public/esempio/` e viene letto con le regole, senza costi AI.
+Ogni lettura AI scrive nei log di Vercel i token usati, per stimare il costo per pagina.
 
 ## Prossimi passi
 

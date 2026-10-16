@@ -1,6 +1,7 @@
 // Esportazione in Excel e CSV (formato italiano: separatore ";" e virgola decimale).
 import ExcelJS from "exceljs";
-import { formatData } from "./numeri";
+import { formatData, formatImporto } from "./numeri";
+import { statoFattura } from "./riconciliazione";
 import type { Risultato } from "./types";
 
 const csvCampo = (v: string) => (/[;"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
@@ -9,7 +10,12 @@ const csvNumero = (n: number | null) => (n === null ? "" : n.toFixed(2).replace(
 function fatturaPer(r: Risultato, movimentoId: string) {
   const a = r.abbinamenti.find((x) => x.movimentoId === movimentoId);
   const f = a && r.fatture.find((x) => x.id === a.fatturaId);
-  return f ? `${f.numero} del ${formatData(f.data)}` : "";
+  if (!f || !a) return "";
+  return `${f.numero} del ${formatData(f.data)}${a.parziale ? ` (parziale ${formatImporto(a.importo)} su ${formatImporto(f.totale)})` : ""}`;
+}
+
+export function daVerificare(r: Risultato, id: string, affidabilita: number): boolean {
+  return affidabilita < 0.8 || r.estratto.controlloSaldi.righeSospette?.includes(id);
 }
 
 /** CSV movimenti: data;valuta;descrizione;entrate;uscite;saldo;categoria;fattura */
@@ -72,7 +78,7 @@ export async function excel(r: Risultato): Promise<Buffer> {
       saldo: m.saldo,
       categoria: m.categoria,
       fattura: fatturaPer(r, m.id),
-      verifica: m.affidabilita < 0.8 ? "Sì" : "",
+      verifica: daVerificare(r, m.id, m.affidabilita) ? "Sì" : "",
     });
   }
   ws.autoFilter = { from: "A1", to: "H1" };
@@ -92,7 +98,7 @@ export async function excel(r: Risultato): Promise<Buffer> {
     ["Saldo finale", e.saldoFinale],
     ["Controllo saldi", e.controlloSaldi.eseguito ? (e.controlloSaldi.quadra ? "OK" : `Differenza ${csvNumero(e.controlloSaldi.differenza)}`) : "Non eseguito"],
     ["Movimenti", e.movimenti.length],
-    ["Fatture abbinate", `${r.abbinamenti.length} su ${r.fatture.length}`],
+    ["Fatture pagate", `${r.fatture.filter((f) => statoFattura(f, r.abbinamenti).stato === "pagata").length} su ${r.fatture.length}`],
   ]);
   riep.getColumn(1).font = { bold: true };
   riep.getColumn(1).width = 20;
@@ -117,21 +123,29 @@ export async function excel(r: Risultato): Promise<Buffer> {
       { header: "Tipo", key: "tipo", width: 12 },
       { header: "Controparte", key: "controparte", width: 36 },
       { header: "Totale", key: "totale", width: 14, style: { numFmt: euro } },
-      { header: "Stato", key: "stato", width: 14 },
-      { header: "Movimento", key: "mov", width: 60 },
+      { header: "Stato", key: "stato", width: 16 },
+      { header: "Pagato", key: "pagato", width: 14, style: { numFmt: euro } },
+      { header: "Residuo", key: "residuo", width: 14, style: { numFmt: euro } },
+      { header: "Movimenti", key: "mov", width: 60 },
     ];
     fw.getRow(1).font = { bold: true };
+    const etichetta = { pagata: "Pagata", parziale: "Pagata in parte", aperta: "Da incassare/pagare" };
     for (const f of r.fatture) {
-      const a = r.abbinamenti.find((x) => x.fatturaId === f.id);
-      const m = a && e.movimenti.find((x) => x.id === a.movimentoId);
+      const s = statoFattura(f, r.abbinamenti);
+      const movs = r.abbinamenti
+        .filter((x) => x.fatturaId === f.id)
+        .map((a) => e.movimenti.find((x) => x.id === a.movimentoId))
+        .filter((m): m is NonNullable<typeof m> => Boolean(m));
       fw.addRow({
         numero: f.numero,
         data: d(f.data),
         tipo: f.tipo,
         controparte: f.tipo === "attiva" ? f.cessionario : f.cedente,
         totale: f.totale,
-        stato: m ? "Pagata" : "Da incassare/pagare",
-        mov: m ? `${formatData(m.data)} ${m.descrizione}` : "",
+        stato: etichetta[s.stato],
+        pagato: s.pagato,
+        residuo: s.residuo,
+        mov: movs.map((m) => `${formatData(m.data)} ${m.descrizione}`).join(" | "),
       });
     }
   }

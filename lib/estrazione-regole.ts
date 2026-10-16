@@ -11,6 +11,11 @@ type Riga = { y: number; pezzi: Pezzo[] };
 const RE_IMPORTO = /^[-+]?\d{1,3}(\.\d{3})*,\d{2}$|^[-+]?\d+,\d{2}$/;
 const RE_IBAN = /IT\d{2}[A-Z]\d{10}[0-9A-Z]{12}/;
 
+export async function contaPagine(pdf: Uint8Array): Promise<number> {
+  const doc = await getDocumentProxy(pdf.slice());
+  return doc.numPages;
+}
+
 async function righePdf(pdf: Uint8Array): Promise<Riga[][]> {
   const doc = await getDocumentProxy(pdf);
   const pagine: Riga[][] = [];
@@ -143,12 +148,18 @@ export async function estraiConRegole(pdf: Uint8Array): Promise<Omit<Estratto, "
   for (const m of movimenti) m.categoria = categoriaDaRegole(m.descrizione, m.importo);
 
   const banca =
-    testo.match(/Intesa Sanpaolo|UniCredit|BPER|Banco BPM|Poste Italiane|BancoPosta|Fineco|Mediolanum|Crédit Agricole|BNL|Monte dei Paschi|Credem|ING|N26|Revolut|Banca Sella|Banca \w+/i)?.[0] ?? null;
+    testo.match(/\b(?:Intesa Sanpaolo|UniCredit|BPER|Banco BPM|Poste Italiane|BancoPosta|Fineco|Mediolanum|Crédit Agricole|BNL|Monte dei Paschi|Credem|ING Bank|N26|Revolut|Banca Sella)\b/i)?.[0] ??
+    testo.match(/(?:Cassa Rurale|Cassa di Risparmio|Banca Popolare|Credito Cooperativo|Banca)(?:[ \t]+[^\s\d-][^\s]*){0,2}/i)?.[0]?.trim() ??
+    null;
   const periodo = testo.match(/dal\s+(\d{2}\/\d{2}\/\d{4})\s+al\s+(\d{2}\/\d{2}\/\d{4})/i);
 
   return {
     banca,
-    intestatario: testo.match(/Intestat[oa]\s*(?:a)?\s*:?\s*([^\n]+)/i)?.[1]?.trim() ?? null,
+    intestatario:
+      testo
+        .match(/Intestat(?:ario|aria|o|a)(?:\s+a)?\s*:?\s*([^\n]+)/i)?.[1]
+        ?.split(/\s+-\s+|\s{2,}|\s+P\.?\s?IVA|\s+C\.?F\./i)[0]
+        ?.trim() || null,
     iban: testo.replace(/\s/g, "").match(RE_IBAN)?.[0] ?? null,
     periodoDa: periodo ? parseData(periodo[1]) : (movimenti[0]?.data ?? null),
     periodoA: periodo ? parseData(periodo[2]) : (movimenti.at(-1)?.data ?? null),

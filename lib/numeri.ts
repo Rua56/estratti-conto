@@ -26,7 +26,8 @@ export function parseData(s: string): string | null {
 export const arrotonda = (n: number) => Math.round(n * 100) / 100;
 
 export function formatImporto(n: number): string {
-  return n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  // useGrouping "always": in it-IT le cifre da 4 non avrebbero il punto (1464,00 invece di 1.464,00).
+  return n.toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" } as Intl.NumberFormatOptions);
 }
 
 export function formatData(iso: string | null): string {

@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { CATEGORIE } from "./categorie";
+import { CATEGORIE, GUIDA_CATEGORIE } from "./categorie";
 import { arrotonda } from "./numeri";
 import type { Estratto } from "./types";
 
@@ -34,7 +34,10 @@ const ISTRUZIONI = `Sei un assistente per studi di commercialisti italiani. Rice
 Estrai tutti i movimenti nell'ordine in cui compaiono, senza saltarne nessuno e senza includere righe di riepilogo, totali o saldi.
 Unisci in un'unica descrizione le righe che continuano lo stesso movimento.
 Il segno dell'importo deve rispettare la colonna: Dare/Uscite/Addebiti = negativo, Avere/Entrate/Accrediti = positivo.
-Assegna a ogni movimento la categoria più adatta tra quelle ammesse; usa "Altro" se nessuna è chiara.
+Assegna a ogni movimento la categoria più adatta tra quelle ammesse, in base alla natura della spesa o dell'incasso e non al mezzo di pagamento; usa "Altro" se nessuna è chiara.
+Indicazioni sulle categorie:
+${GUIDA_CATEGORIE}
+Nel campo saldo riporta il saldo progressivo della riga solo se è stampato nel documento.
 Se il documento non è un estratto conto, restituisci un elenco di movimenti vuoto.`;
 
 export function aiDisponibile(): boolean {
@@ -65,6 +68,8 @@ export async function estraiConAi(pdf: Uint8Array): Promise<Omit<Estratto, "cont
     ],
   });
   const risposta = await stream.finalMessage();
+  // Nei log di Vercel: serve a stimare il costo per pagina e a fissare i prezzi.
+  console.log(JSON.stringify({ evento: "lettura_ai", modello: risposta.model, uso: risposta.usage }));
 
   if (risposta.stop_reason === "refusal") throw new Error("Il modello ha rifiutato di elaborare il documento.");
   if (risposta.stop_reason === "max_tokens") throw new Error("Documento troppo lungo: dividilo in più file.");

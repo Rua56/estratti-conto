@@ -1,6 +1,7 @@
 import { aiDisponibile, estraiConAi } from "./estrazione-ai";
 import { estraiConRegole } from "./estrazione-regole";
 import { leggiFatturaPA } from "./fatturapa";
+import { formatImporto } from "./numeri";
 import { controllaSaldi, riconcilia } from "./riconciliazione";
 import type { Estratto, Fattura, Risultato } from "./types";
 
@@ -25,13 +26,17 @@ export async function elabora(input: Input): Promise<Risultato & { avvisi: strin
     }
   } else {
     base = await estraiConRegole(input.pdf);
-    if (!aiDisponibile()) avvisi.push("Lettura AI non configurata: uso il riconoscimento a regole (solo PDF digitali, non scansioni).");
+    if (!aiDisponibile() && !input.forzaRegole) avvisi.push("Lettura AI non configurata: uso il riconoscimento a regole (solo PDF digitali, non scansioni).");
   }
   if (!base.movimenti.length) avvisi.push("Nessun movimento trovato. Il PDF potrebbe essere una scansione o un formato non ancora supportato.");
 
   const estratto: Estratto = { ...base, controlloSaldi: controllaSaldi(base) };
-  if (estratto.controlloSaldi.eseguito && !estratto.controlloSaldi.quadra)
-    avvisi.push(`I saldi non quadrano (differenza ${estratto.controlloSaldi.differenza}): controlla i movimenti segnalati.`);
+  const { eseguito, quadra, differenza, righeSospette } = estratto.controlloSaldi;
+  if (eseguito && !quadra)
+    avvisi.push(`I saldi non quadrano (differenza ${formatImporto(differenza ?? 0)} €): controlla i movimenti evidenziati.`);
+  if (righeSospette.length)
+    avvisi.push(`Su ${righeSospette.length === 1 ? "un movimento" : `${righeSospette.length} movimenti`} il saldo progressivo stampato dalla banca non torna: sono evidenziati in tabella.`);
+  if (!eseguito && base.movimenti.length) avvisi.push("Saldo iniziale o finale non trovato: controllo dei saldi non eseguito.");
 
   const fatture: Fattura[] = [];
   for (const f of input.fatture) {

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "prova": "tsx scripts/prova.mts"
+    "prova": "tsx scripts/prova.mts",
+    "test": "tsx scripts/verifica.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.135.0",

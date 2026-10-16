@@ -26,6 +26,8 @@ export type ControlloSaldi = {
   eseguito: boolean;
   quadra: boolean;
   differenza: number | null;
+  /** Movimenti dopo i quali il saldo progressivo stampato non torna. */
+  righeSospette: string[];
 };
 
 export type Fattura = {
@@ -47,7 +49,11 @@ export type Abbinamento = {
   fatturaId: string;
   punteggio: number; // 0-1
   motivi: string[];
+  importo: number; // quota della fattura coperta da questo movimento
+  parziale: boolean; // acconto o pagamento parziale
 };
+
+export type StatoFattura = { stato: "pagata" | "parziale" | "aperta"; pagato: number; residuo: number };
 
 export type Risultato = {
   estratto: Estratto;
