@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { NextResponse } from "next/server";
+import { GRATIS_AL_MESE, abbonato, cookieGratis, gratisUsate, pagamentiAttivi } from "../../../lib/accesso";
 import { elabora } from "../../../lib/elabora";
 import { contaPagine } from "../../../lib/estrazione-regole";
 import { HASH_ESEMPIO, LIMITI } from "../../../lib/limiti";
@@ -10,10 +11,10 @@ export const maxDuration = 300;
 // Limite d'uso per indirizzo IP. In memoria: vale per singola istanza, basta a frenare gli abusi
 // finché non ci sono account e abbonamenti.
 const usi = new Map<string, number[]>();
-function troppeRichieste(ip: string): boolean {
+function troppeRichieste(ip: string, limite: number): boolean {
   const ora = Date.now();
   const recenti = (usi.get(ip) ?? []).filter((t) => ora - t < 3_600_000);
-  if (recenti.length >= LIMITI.conversioniOra) return true;
+  if (recenti.length >= limite) return true;
   recenti.push(ora);
   usi.set(ip, recenti);
   return false;
@@ -46,9 +47,20 @@ export async function POST(req: Request) {
   }
   if (pagine > LIMITI.pagine) return errore(`L'estratto ha ${pagine} pagine: il massimo è ${LIMITI.pagine}. Dividilo in più file.`);
 
+  // Prove gratuite e abbonamento (solo quando i pagamenti sono attivi). L'esempio è sempre libero.
+  const conAbbonamento = !esempio && pagamentiAttivi() && (await abbonato(req));
+  const gratisDaContare = !esempio && pagamentiAttivi() && !conAbbonamento;
+  const usate = gratisDaContare ? gratisUsate(req) : 0;
+  if (gratisDaContare && usate >= GRATIS_AL_MESE)
+    return NextResponse.json(
+      { errore: `Hai usato le ${GRATIS_AL_MESE} conversioni gratuite di questo mese. Con l'abbonamento Studio le conversioni sono illimitate.`, serveAbbonamento: true },
+      { status: 402 },
+    );
+
   if (!esempio) {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "sconosciuto";
-    if (troppeRichieste(ip)) return errore("Hai raggiunto il limite di conversioni per quest'ora. Riprova più tardi.", 429);
+    if (troppeRichieste(ip, conAbbonamento ? LIMITI.conversioniOraAbbonati : LIMITI.conversioniOra))
+      return errore("Hai raggiunto il limite di conversioni per quest'ora. Riprova più tardi.", 429);
   }
 
   const fatture = await Promise.all(
@@ -68,7 +80,10 @@ export async function POST(req: Request) {
       forzaRegole: esempio,
     });
     if (esempio) risultato.avvisi.unshift("Esempio con dati inventati: carica un tuo estratto conto per provarlo sul serio.");
-    return NextResponse.json(risultato);
+    const res = NextResponse.json(risultato);
+    // Conta la prova gratuita solo se ha letto qualcosa.
+    if (gratisDaContare && risultato.estratto.movimenti.length) res.headers.append("Set-Cookie", cookieGratis(usate + 1));
+    return res;
   } catch (e) {
     console.error(e);
     return errore("Non sono riuscito a leggere questo estratto conto. Riprova o scrivici se il problema continua.", 500);

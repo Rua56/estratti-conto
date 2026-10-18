@@ -4,6 +4,8 @@ export const LIMITI = {
   pagine: 40,
   fatture: 200,
   conversioniOra: 15,
+  conversioniOraAbbonati: 60,
+  pdfInsieme: 20, // estratti caricabili in una volta (vengono convertiti uno alla volta)
 };
 
 /** SHA-256 di public/esempio/estratto-marzo-2026.pdf: l'esempio viene letto senza AI. */

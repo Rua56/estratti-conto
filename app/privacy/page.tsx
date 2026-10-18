@@ -24,6 +24,8 @@ export default function Privacy() {
           <li>L&apos;estratto conto PDF e le eventuali fatture elettroniche XML che carichi, con i dati che contengono (nomi, IBAN, importi, causali).</li>
           <li>La partita IVA che inserisci, usata solo per distinguere le fatture emesse da quelle ricevute.</li>
           <li>L&apos;indirizzo IP della richiesta, tenuto in memoria per un&apos;ora per limitare gli abusi.</li>
+          <li>Se ci scrivi dal modulo contatti o invii una segnalazione: email, nome dello studio e testo del messaggio.</li>
+          <li>Se ti abboni: i dati di pagamento e fatturazione, raccolti e conservati da Stripe. Noi riceviamo solo l&apos;identificativo dell&apos;abbonamento.</li>
         </ul>
 
         <h2>Come li trattiamo</h2>
@@ -35,7 +37,15 @@ export default function Privacy() {
             i dati inviati tramite API non vengono usati per addestrare i modelli. Anthropic ha sede negli Stati Uniti: il trasferimento avviene
             con le garanzie previste dal GDPR.
           </li>
-          <li>Non usiamo cookie di profilazione né strumenti di tracciamento pubblicitario.</li>
+          <li>
+            Usiamo solo cookie tecnici: uno conta le conversioni gratuite del mese, l&apos;altro contiene il codice dell&apos;abbonamento. Non usiamo cookie
+            di profilazione né strumenti di tracciamento pubblicitario.
+          </li>
+          <li>Contiamo le visite con Vercel Web Analytics, che non usa cookie e non identifica i singoli visitatori.</li>
+          <li>
+            I messaggi del modulo contatti e le segnalazioni sono conservati in un archivio privato su Vercel finché servono a risponderti e a
+            migliorare il servizio; puoi chiederne la cancellazione in qualsiasi momento.
+          </li>
         </ul>
 
         <h2>I tuoi diritti</h2>
@@ -50,7 +60,7 @@ export default function Privacy() {
           <a href="mailto:iuran56@gmail.com">iuran56@gmail.com</a>.
         </p>
 
-        <p className="hint">Ultimo aggiornamento: 18 ottobre 2026.</p>
+        <p className="hint">Ultimo aggiornamento: 18 ottobre 2026 (contatti, abbonamento e statistiche).</p>
         <p>
           <a href="/">← Torna alla conversione</a>
         </p>

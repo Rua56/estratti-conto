@@ -5,7 +5,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { categoriaDaRegole } from "../lib/categorie";
 import { elabora } from "../lib/elabora";
-import { csvPrimaNota, excel } from "../lib/esportazione";
+import { OPZIONI_GESTIONALE, csvGestionale, csvPrimaNota, excel } from "../lib/esportazione";
+import { unisci } from "../lib/unisci";
 import { controllaSaldi, statoFattura } from "../lib/riconciliazione";
 import type { Movimento } from "../lib/types";
 
@@ -95,6 +96,34 @@ await prova("export: Excel valido e CSV con separatore italiano", async () => {
   const csv = csvPrimaNota(real);
   assert.match(csv, /^﻿Data;Conto dare;Conto avere;Importo/);
   assert.match(csv, /parziale 1\.464,00 su 4\.880,00/);
+});
+
+await prova("più estratti insieme: movimenti uniti e fatture riabbinate una volta sola", async () => {
+  const u = unisci([real, ti]);
+  assert.equal(u.estratto.movimenti.length, real.estratto.movimenti.length + ti.estratto.movimenti.length);
+  assert.equal(new Set(u.estratto.movimenti.map((m) => m.id)).size, u.estratto.movimenti.length);
+  assert.equal(u.estratto.controlloSaldi.quadra, true);
+  assert.equal(u.abbinamenti.length, real.abbinamenti.length);
+  const xlsx = await excel(u, [real.estratto, ti.estratto]);
+  assert.equal(xlsx.subarray(0, 2).toString(), "PK");
+});
+await prova("CSV gestionale: codici conto, separatore e formato data", () => {
+  const csv = csvGestionale(real, { ...OPZIONI_GESTIONALE, separatore: "\t", decimale: ".", formatoData: "ggmmaaaa", contoBanca: "18.05.001", conti: { "Incassi da clienti": "15.01.001" } });
+  const righe = csv.replace(/^\ufeff/, "").split("\r\n");
+  assert.equal(righe[0].split("\t")[2], "Conto dare");
+  const incasso = righe.find((r) => r.includes("15.01.001"))!.split("\t");
+  assert.match(incasso[0], /^\d{8}$/);
+  assert.equal(incasso[2], "18.05.001");
+  assert.equal(incasso[3], "15.01.001");
+  assert.match(incasso[4], /^\d+\.\d{2}$/);
+});
+await prova("accesso: codice firmato valido solo se intatto", async () => {
+  process.env.ACCESSO_SECRET = "prova";
+  const { firmato, verificato } = await import("../lib/accesso");
+  const c = firmato("sub_123");
+  assert.equal(verificato(c), "sub_123");
+  assert.equal(verificato(c.replace("sub_123", "sub_124")), null);
+  assert.equal(verificato("sub_123"), null);
 });
 
 console.log(`\n${ok} controlli superati${process.exitCode ? ", alcuni falliti" : ""}.`);

@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.135.0",
+    "@vercel/analytics": "2.0.1",
+    "@vercel/blob": "2.8.2",
     "exceljs": "4.4.0",
     "fast-xml-parser": "5.11.2",
     "next": "15.5.28",

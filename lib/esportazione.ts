@@ -2,7 +2,9 @@
 import ExcelJS from "exceljs";
 import { formatData, formatImporto } from "./numeri";
 import { statoFattura } from "./riconciliazione";
-import type { Risultato } from "./types";
+import type { OpzioniGestionale } from "./esportazione-opzioni";
+import { etichettaEstratto } from "./unisci";
+import type { Estratto, Risultato } from "./types";
 
 const csvCampo = (v: string) => (/[;"\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 const csvNumero = (n: number | null) => (n === null ? "" : n.toFixed(2).replace(".", ","));
@@ -51,7 +53,8 @@ export function csvPrimaNota(r: Risultato, contoBanca = "Banca c/c"): string {
   return "﻿" + righe.join("\r\n");
 }
 
-export async function excel(r: Risultato): Promise<Buffer> {
+/** Excel completo. Con più estratti, `estratti` aggiunge il foglio di riepilogo per conto. */
+export async function excel(r: Risultato, estratti: Estratto[] = []): Promise<Buffer> {
   const wb = new ExcelJS.Workbook();
   wb.creator = "Estratti Conto";
   const euro = '#,##0.00 "€";[Red]-#,##0.00 "€"';
@@ -66,6 +69,7 @@ export async function excel(r: Risultato): Promise<Buffer> {
     { header: "Categoria", key: "categoria", width: 28 },
     { header: "Fattura abbinata", key: "fattura", width: 24 },
     { header: "Da verificare", key: "verifica", width: 13 },
+    ...(estratti.length > 1 ? [{ header: "Conto", key: "conto", width: 34 }] : []),
   ];
   ws.getRow(1).font = { bold: true };
   const d = (iso: string | null) => (iso ? new Date(`${iso}T00:00:00Z`) : null);
@@ -79,9 +83,10 @@ export async function excel(r: Risultato): Promise<Buffer> {
       categoria: m.categoria,
       fattura: fatturaPer(r, m.id),
       verifica: daVerificare(r, m.id, m.affidabilita) ? "Sì" : "",
+      conto: m.conto ?? "",
     });
   }
-  ws.autoFilter = { from: "A1", to: "H1" };
+  ws.autoFilter = { from: "A1", to: estratti.length > 1 ? "I1" : "H1" };
 
   const riep = wb.addWorksheet("Riepilogo");
   const e = r.estratto;
@@ -104,6 +109,30 @@ export async function excel(r: Risultato): Promise<Buffer> {
   riep.getColumn(1).width = 20;
   riep.getColumn(2).width = 40;
   for (const i of [5, 6, 7, 8]) riep.getCell(`B${i}`).numFmt = euro;
+
+  if (estratti.length > 1) {
+    const es = wb.addWorksheet("Estratti");
+    es.columns = [
+      { header: "Estratto", key: "nome", width: 40 },
+      { header: "Intestatario", key: "int", width: 30 },
+      { header: "IBAN", key: "iban", width: 30 },
+      { header: "Saldo iniziale", key: "si", width: 15, style: { numFmt: euro } },
+      { header: "Saldo finale", key: "sf", width: 15, style: { numFmt: euro } },
+      { header: "Movimenti", key: "n", width: 11 },
+      { header: "Controllo saldi", key: "ok", width: 18 },
+    ];
+    es.getRow(1).font = { bold: true };
+    for (const x of estratti)
+      es.addRow({
+        nome: etichettaEstratto(x),
+        int: x.intestatario ?? "",
+        iban: x.iban ?? "",
+        si: x.saldoIniziale,
+        sf: x.saldoFinale,
+        n: x.movimenti.length,
+        ok: x.controlloSaldi.eseguito ? (x.controlloSaldi.quadra ? "OK" : `Differenza ${csvNumero(x.controlloSaldi.differenza)}`) : "Non eseguito",
+      });
+  }
 
   const per = new Map<string, number>();
   for (const m of e.movimenti) per.set(m.categoria, (per.get(m.categoria) ?? 0) + m.importo);
@@ -151,4 +180,40 @@ export async function excel(r: Risultato): Promise<Buffer> {
   }
 
   return Buffer.from(await wb.xlsx.writeBuffer());
+}
+
+export { OPZIONI_GESTIONALE, type OpzioniGestionale } from "./esportazione-opzioni";
+
+function dataIn(iso: string | null, formato: OpzioniGestionale["formatoData"]) {
+  if (!iso) return "";
+  const [a, m, g] = iso.split("-");
+  return { "gg/mm/aaaa": `${g}/${m}/${a}`, "aaaa-mm-gg": iso, "gg-mm-aaaa": `${g}-${m}-${a}`, ggmmaaaa: `${g}${m}${a}` }[formato];
+}
+
+export function csvGestionale(r: Risultato, o: OpzioniGestionale): string {
+  const sep = o.separatore;
+  const campo = (v: string) => (v.includes(sep) || /["\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+  const num = (n: number | null) => (n === null ? "" : n.toFixed(2).replace(".", o.decimale));
+  const conto = (categoria: string) => o.conti[categoria]?.trim() || categoria;
+  const righe: string[][] = [];
+  if (o.tracciato === "primanota") {
+    if (o.intestazione) righe.push(["Data", "Data valuta", "Conto dare", "Conto avere", "Importo", "Descrizione", "Documento"]);
+    for (const m of r.estratto.movimenti) {
+      const entrata = m.importo > 0;
+      righe.push([
+        dataIn(m.data, o.formatoData),
+        dataIn(m.dataValuta, o.formatoData),
+        entrata ? o.contoBanca : conto(m.categoria),
+        entrata ? conto(m.categoria) : o.contoBanca,
+        num(Math.abs(m.importo)),
+        m.descrizione,
+        fatturaPer(r, m.id),
+      ]);
+    }
+  } else {
+    if (o.intestazione) righe.push(["Data", "Data valuta", "Descrizione", "Importo", "Conto", "Categoria", "Documento"]);
+    for (const m of r.estratto.movimenti)
+      righe.push([dataIn(m.data, o.formatoData), dataIn(m.dataValuta, o.formatoData), m.descrizione, num(m.importo), conto(m.categoria), m.categoria, fatturaPer(r, m.id)]);
+  }
+  return "\ufeff" + righe.map((x) => x.map(campo).join(sep)).join("\r\n");
 }

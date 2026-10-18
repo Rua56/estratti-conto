@@ -140,3 +140,57 @@ td.data .hint { display: block; font-size: 12px; }
   .fatt .f-data { order: 5; color: var(--muted); }
   .fatt .f-stato { order: 6; grid-column: 2 / -1; text-align: right; }
 }
+
+/* Pagina di presentazione */
+.menu { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+.menu a { color: var(--muted); text-decoration: none; }
+.menu a:hover { color: var(--accent); }
+.eroe { max-width: 820px; }
+.occhiello { color: var(--accent); font-weight: 600; font-size: 14px; margin: 0 0 6px; }
+.sezione { margin-top: 48px; scroll-margin-top: 16px; }
+.sezione > h2 { font-size: clamp(20px, 3vw, 26px); }
+.passi { margin-top: 8px; }
+.funzioni { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.funzioni div { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+.funzioni h3, .piano h3 { font-size: 16px; margin: 0 0 6px; }
+.funzioni p { margin: 0; color: var(--muted); font-size: 14px; }
+.piani { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: stretch; }
+.piano { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.piano.evidenza { border: 2px solid var(--accent); }
+.piano ul { margin: 0 0 8px; padding-left: 18px; color: var(--muted); font-size: 14px; flex: 1; }
+.piano li { margin-bottom: 4px; }
+.piano .hint { margin: 0; }
+.prezzo { font-size: 28px; font-weight: 700; margin: 0; }
+.prezzo span { font-size: 14px; font-weight: 400; color: var(--muted); }
+.bottone { display: inline-block; text-align: center; font-weight: 600; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--bg); text-decoration: none; }
+.bottone.secondario { background: transparent; color: var(--accent); }
+.ok-box { background: var(--accent-soft); color: var(--accent); margin-top: 16px; }
+.codice { margin-top: 16px; }
+.codice-form { margin-top: 20px; max-width: 560px; }
+.riga-codice { display: flex; gap: 8px; }
+.riga-codice input { flex: 1; min-width: 0; font-family: ui-monospace, monospace; font-size: 13px; }
+.faq { display: grid; gap: 8px; max-width: 820px; }
+.faq details { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; }
+.faq summary { font-weight: 600; cursor: pointer; }
+.faq p { margin: 8px 0 0; color: var(--muted); }
+input[type="email"], input[type="password"], textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--card); color: var(--text); font: inherit;
+}
+textarea { resize: vertical; }
+.trappola { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.accesso { margin: 12px 0 0; }
+.estratti { flex-wrap: wrap; margin-bottom: 12px; }
+.gestionale { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+.gestionale summary { font-weight: 600; cursor: pointer; color: var(--accent); }
+.opzioni { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin: 12px 0; }
+.opzioni label { font-size: 13px; }
+.opzioni select, .opzioni input[type="text"] { margin-top: 4px; font-weight: 400; }
+.spunta { display: flex; align-items: center; gap: 8px; align-self: end; font-weight: 400 !important; }
+table.conti { margin-bottom: 12px; }
+table.conti input { padding: 4px 8px; }
+.segnala p { margin: 0; }
+.segnala label { margin-top: 8px; }
+button.link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; font-weight: 600; }
+.conto { display: block; font-size: 12px; }
+.piede .azioni { gap: 16px; }

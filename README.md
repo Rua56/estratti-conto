@@ -46,3 +46,15 @@ Ogni lettura AI scrive nei log di Vercel i token usati, per stimare il costo per
 - Piano dei conti personalizzabile per studio e apprendimento dalle correzioni.
 - Account, abbonamenti Stripe e limiti di pagine per piano.
 - Test su estratti conto reali delle principali banche (Intesa, UniCredit, BPER, Banco BPM, Poste, Fineco).
+
+## Abbonamento, contatti e statistiche (ottobre 2026)
+
+- **Prove gratuite e abbonamento** (`lib/accesso.ts`): 3 conversioni gratis al mese per browser (cookie firmato), poi abbonamento
+  Studio 29 €/mese con Stripe Checkout, senza database. Dopo il pagamento il browser riceve un codice di accesso firmato (l'id
+  dell'abbonamento Stripe) che si può incollare su altri computer. I pagamenti si attivano solo quando c'è `STRIPE_SECRET_KEY`;
+  senza, il sito resta gratuito con il limite orario per IP. `ACCESSO_SECRET` firma i codici.
+- **Contatti e segnalazioni** (`lib/contatti.ts`): salvati come JSON nel Blob store privato `estratti-conto-contatti`
+  (`BLOB_READ_WRITE_TOKEN`). Si leggono da `/admin` con `ADMIN_KEY`.
+- **Più estratti insieme** (`lib/unisci.ts`): il browser li converte uno alla volta, poi li unisce e rifà l'abbinamento con le fatture.
+- **CSV per il gestionale** (`csvGestionale`): tracciato prima nota o movimenti, separatore, decimali, formato data, codici conto.
+- **Statistiche**: `@vercel/analytics` nel layout; Web Analytics va attivato una volta dal pannello Vercel del progetto.

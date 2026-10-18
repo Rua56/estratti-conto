@@ -7,6 +7,7 @@ export type Movimento = {
   saldo: number | null;
   categoria: string;
   affidabilita: number; // 0-1
+  conto?: string; // banca/IBAN di provenienza quando si uniscono più estratti
 };
 
 export type Estratto = {
