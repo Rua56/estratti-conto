@@ -45,9 +45,12 @@ export default function Privacy() {
         </p>
 
         <h2>Titolare del trattamento</h2>
-        <p>[Nome, indirizzo e email del titolare da completare prima del lancio commerciale.]</p>
+        <p>
+          Riccardo Iuran, Gorizia. Per qualsiasi richiesta sui dati scrivi a{" "}
+          <a href="mailto:iuran56@gmail.com">iuran56@gmail.com</a>.
+        </p>
 
-        <p className="hint">Ultimo aggiornamento: 16 ottobre 2026.</p>
+        <p className="hint">Ultimo aggiornamento: 18 ottobre 2026.</p>
         <p>
           <a href="/">← Torna alla conversione</a>
         </p>
