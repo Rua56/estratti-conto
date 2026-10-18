@@ -33,7 +33,7 @@ export default function Admin() {
   }, []);
 
   return (
-    <main>
+    <main className="admin">
       <h1>Contatti e segnalazioni</h1>
       <meta name="robots" content="noindex" />
       {!contatti && (

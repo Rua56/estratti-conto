@@ -1,6 +1,17 @@
 import { Analytics } from "@vercel/analytics/next";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Inter, Newsreader } from "next/font/google";
 import "./globals.css";
+
+const testo = Inter({ subsets: ["latin"], variable: "--font-testo", display: "swap" });
+const titoli = Newsreader({ subsets: ["latin"], variable: "--font-titoli", display: "swap", axes: ["opsz"] });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f2f0ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#101512" },
+  ],
+};
 
 const titolo = "Estratti Conto: dall'estratto conto PDF alla prima nota";
 const descrizione =
@@ -17,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it">
+    <html lang="it" className={`${testo.variable} ${titoli.variable}`}>
       <body>
         {children}
         <Analytics />

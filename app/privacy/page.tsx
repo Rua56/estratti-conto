@@ -9,11 +9,14 @@ export default function Privacy() {
   return (
     <>
       <header className="barra">
-        <div className="contenuto">
-          <a href="/" className="logo">
-            <span aria-hidden>€</span> Estratti Conto
+        <a href="/" className="marchio">
+          Estratti Conto
+        </a>
+        <nav className="menu" aria-label="Sezioni">
+          <a href="/#converti" className="menu-azione">
+            Converti
           </a>
-        </div>
+        </nav>
       </header>
       <main className="testo">
         <h1>Privacy</h1>

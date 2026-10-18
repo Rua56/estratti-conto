@@ -60,55 +60,47 @@ export default function Prezzi({ gratisAlMese, euroAlMese }: { gratisAlMese: num
 
   return (
     <>
-      <div className="piani">
-        <div className="piano">
-          <h3>Prova</h3>
-          <p className="prezzo">Gratis</p>
-          <ul>
-            <li>{gratisAlMese} conversioni al mese</li>
-            <li>Tutte le funzioni, anche le scansioni</li>
-            <li>L&apos;esempio si può provare quante volte vuoi</li>
-          </ul>
-          <a className="bottone secondario" href="#converti">
-            Prova ora
-          </a>
+      <div className="piano-studio">
+        <div className="prezzo-grande" data-rivela>
+          <b>{euroAlMese} €</b>
+          <span>al mese per tutto lo studio, piano Studio</span>
         </div>
-        <div className="piano evidenza">
-          <h3>Studio</h3>
-          <p className="prezzo">
-            {euroAlMese} € <span>al mese</span>
-          </p>
+        <div className="piano-dettagli" data-rivela style={{ "--d": "100ms" } as React.CSSProperties}>
           <ul>
-            <li>Conversioni illimitate (uso ragionevole)</li>
-            <li>Più estratti e più conti insieme</li>
+            <li>Conversioni illimitate, con un uso ragionevole</li>
+            <li>Più estratti e più conti nello stesso caricamento</li>
             <li>CSV con i codici conto del tuo gestionale</li>
-            <li>Su tutti i computer dello studio con un codice</li>
-            <li>Disdici quando vuoi, senza vincoli</li>
+            <li>Su tutti i computer dello studio con un codice di accesso</li>
+            <li>Disdetta in autonomia, resta attivo fino a fine mese</li>
           </ul>
           {stato?.abbonato ? (
             <p className="ok">Il tuo abbonamento è attivo.</p>
           ) : pagamenti ? (
-            <button type="button" onClick={abbonati} disabled={attesa}>
+            <button type="button" className="grande chiaro" onClick={abbonati} disabled={attesa}>
               {attesa ? "Apro il pagamento..." : "Attiva l'abbonamento"}
             </button>
           ) : (
-            <a className="bottone" href="#contatti">
+            <a className="bottone grande chiaro" href="#contatti">
               Avvisami quando apre
             </a>
           )}
-          <p className="hint">{pagamenti ? "Pagamento sicuro con carta tramite Stripe." : "Gli abbonamenti aprono a breve: intanto la prova è gratuita."}</p>
+          <p className="hint">{pagamenti ? "Pagamento con carta tramite Stripe. Fattura con i dati dello studio." : "Gli abbonamenti aprono a breve: intanto la prova è gratuita."}</p>
         </div>
-        <div className="piano">
-          <h3>Studi grandi</h3>
-          <p className="prezzo">Su misura</p>
-          <ul>
-            <li>Molti clienti e molti conti ogni mese</li>
-            <li>Tracciato pronto per il vostro gestionale</li>
-            <li>Supporto diretto</li>
-          </ul>
-          <a className="bottone secondario" href="#contatti">
-            Scrivici
-          </a>
+      </div>
+      <div className="altri-piani">
+        <div data-rivela>
+          <h3>Prova gratis</h3>
+          <p>
+            {gratisAlMese} conversioni ogni mese con tutte le funzioni, scansioni comprese, senza registrarti. L&apos;esempio si prova quante volte vuoi.{" "}
+            <a href="#converti">Prova ora</a>
+          </p>
+        </div>
+        <div data-rivela style={{ "--d": "80ms" } as React.CSSProperties}>
+          <h3>Studi grandi e CED</h3>
+          <p>
+            Molti clienti e molti conti ogni mese, tracciato pronto per il vostro gestionale, supporto diretto. Prezzo su misura.{" "}
+            <a href="#contatti">Scrivici</a>
+          </p>
         </div>
       </div>
 

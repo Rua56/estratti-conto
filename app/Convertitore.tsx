@@ -46,6 +46,8 @@ export default function Convertitore() {
   const inputFile = useRef<HTMLInputElement>(null);
   const risultati = useRef<HTMLDivElement>(null);
   const inCorso = avanzamento !== null;
+  const inCorsoRef = useRef(inCorso);
+  inCorsoRef.current = inCorso;
 
   useEffect(() => setOpzioni(leggiOpzioni()), []);
   useEffect(() => {
@@ -143,6 +145,15 @@ export default function Convertitore() {
       setErrore("Non riesco a caricare l'esempio. Riprova.");
     }
   }
+
+  // Il bottone "Prova con un esempio" in cima alla pagina avvia l'esempio qui.
+  const esempio = useRef(provaEsempio);
+  esempio.current = provaEsempio;
+  useEffect(() => {
+    const avvia = () => !inCorsoRef.current && esempio.current();
+    window.addEventListener("ec-esempio", avvia);
+    return () => window.removeEventListener("ec-esempio", avvia);
+  }, []);
 
   function ricomincia() {
     setFatti([]);
