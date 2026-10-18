@@ -1,4 +1,4 @@
-import { ABBONAMENTO, GRATIS_AL_MESE } from "../lib/accesso";
+import { ABBONAMENTO, GRATIS_AL_MESE, pagamentiAttivi } from "../lib/accesso";
 import { LIMITI } from "../lib/limiti";
 import Contatto from "./Contatto";
 import Convertitore from "./Convertitore";
@@ -242,7 +242,7 @@ export default function Home() {
             <h2 id="titolo-prezzi" data-rivela>
               Un prezzo, disdici quando vuoi
             </h2>
-            <Prezzi gratisAlMese={GRATIS_AL_MESE} euroAlMese={ABBONAMENTO.centesimi / 100} />
+            <Prezzi gratisAlMese={GRATIS_AL_MESE} euroAlMese={ABBONAMENTO.centesimi / 100} pagamentiAttivi={pagamentiAttivi()} />
           </div>
         </section>
 

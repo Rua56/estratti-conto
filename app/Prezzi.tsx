@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAccesso } from "./accesso-client";
 
-export default function Prezzi({ gratisAlMese, euroAlMese }: { gratisAlMese: number; euroAlMese: number }) {
+export default function Prezzi({ gratisAlMese, euroAlMese, pagamentiAttivi }: { gratisAlMese: number; euroAlMese: number; pagamentiAttivi: boolean }) {
   const { stato, aggiorna } = useAccesso();
   const [esito, setEsito] = useState<string | null>(null);
   const [errore, setErrore] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export default function Prezzi({ gratisAlMese, euroAlMese }: { gratisAlMese: num
     aggiorna();
   };
 
-  const pagamenti = stato?.pagamenti ?? false;
+  const pagamenti = stato?.pagamenti ?? pagamentiAttivi;
 
   return (
     <>
