@@ -397,3 +397,29 @@ main.admin .card { margin-top: 16px; }
   table.conti td { border: 0; padding: 0; }
   table.conti input { width: 100%; }
 }
+
+/* Guide */
+.guide { min-height: calc(100vh - 220px); }
+.guide, .articolo { padding: clamp(32px, 5vw, 80px) var(--margine) var(--sezione); }
+.guide h1 { max-width: 14ch; }
+.guide-sub { font-size: var(--step-1); color: var(--ink-2); max-width: 36em; margin: 20px 0 clamp(40px, 5vw, 72px); }
+.guide-elenco { list-style: none; margin: 0; padding: 0; display: grid; }
+.guide-elenco li { border-top: 3px solid var(--ink); }
+.guide-elenco a { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; gap: clamp(16px, 3vw, 48px); padding: 24px 0 32px; color: var(--ink); text-decoration: none; align-items: start; }
+.guide-elenco a:hover h2 { color: var(--accent); }
+.guide-elenco h2 { font-size: var(--step-2); margin: 0; }
+.guide-elenco p { margin: 0; color: var(--ink-2); }
+.guide-elenco time { color: var(--ink-2); font-size: 14px; white-space: nowrap; }
+@media (max-width: 900px) { .guide-elenco a { grid-template-columns: 1fr; gap: 10px; } }
+.articolo { max-width: calc(760px + 2 * var(--margine)); }
+.articolo h1 { font-size: var(--step-3); line-height: 1.05; }
+.articolo-indietro { margin-bottom: 24px; font-size: 15px; }
+.articolo-data { color: var(--ink-2); font-size: 15px; margin: 16px 0 40px; }
+.articolo-testo p, .articolo-testo li { font-size: 18px; line-height: 1.65; }
+.articolo-testo p { margin: 0 0 20px; }
+.articolo-testo h2 { font-size: var(--step-2); margin: 48px 0 16px; }
+.articolo-testo ul { padding-left: 22px; margin: 0 0 24px; }
+.articolo-testo li { margin-bottom: 8px; }
+.articolo-invito { background: var(--field); color: var(--field-ink); padding: clamp(24px, 4vw, 48px); margin-top: 56px; }
+.articolo-invito h2 { font-size: var(--step-2); margin-bottom: 12px; }
+.articolo-invito p { color: var(--field-2); margin-bottom: 24px; }

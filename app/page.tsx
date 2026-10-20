@@ -79,6 +79,7 @@ export default function Home() {
           <a href="#controllo">Come funziona</a>
           <a href="#prezzi">Prezzi</a>
           <a href="#domande">Domande</a>
+          <a href="/guide">Guide</a>
           <a href="#converti" className="menu-azione">
             Converti
           </a>
@@ -286,6 +287,7 @@ export default function Home() {
             <a href="#converti">Converti</a>
             <a href="#prezzi">Prezzi</a>
             <a href="#contatti">Contatti</a>
+            <a href="/guide">Guide</a>
             <a href="/privacy">Privacy</a>
           </span>
         </div>
