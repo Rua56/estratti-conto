@@ -82,6 +82,77 @@ Gli estratti conto contengono dati delicati: IBAN, nomi, importi, causali. I fil
 
 Il modo più rapido per capire se fa al caso tuo è provarlo. Puoi convertire subito un estratto conto di esempio, senza caricare nulla, oppure usare uno dei tuoi: ogni mese hai tre conversioni gratuite, senza registrarti. Carica il PDF, controlla che i saldi tornino e scarica il file Excel.`,
   },
+  {
+    slug: "importare-estratto-conto-in-prima-nota",
+    titolo: "Importare l'estratto conto in prima nota: dal PDF della banca alle registrazioni",
+    descrizione:
+      "Come passare dall'estratto conto PDF alla prima nota senza ribattere i movimenti: quali controlli fare prima, come impostare conto banca e contropartite, e come importare l'estratto conto in prima nota con un file CSV.",
+    parolaChiave: "importare estratto conto in prima nota",
+    data: "2026-10-27",
+    testo: `Per chi tiene la contabilità dei clienti, la prima nota banca è uno dei lavori più ripetitivi del mese. L'estratto conto arriva in PDF, ogni movimento va letto, capito e registrato con la sua contropartita. Importare l'estratto conto in prima nota invece di ribatterlo riga per riga è possibile, ma solo se il file di partenza è pulito e controllato. In questa guida vediamo come si fa il lavoro a mano, dove nascono gli errori e come preparare un file da importare nel programma di contabilità.
+
+## Come si registra a mano un estratto conto
+
+Il procedimento manuale lo conosce chiunque lavori in studio. Si apre il PDF della banca accanto al gestionale e, per ogni movimento:
+
+- si legge la data contabile (e a volte la data valuta);
+- si interpreta la descrizione per capire di che operazione si tratta: un incasso da cliente, un pagamento a fornitore, un F24, una commissione, un giroconto;
+- si sceglie il conto di contropartita del piano dei conti;
+- si decide il verso: un'entrata va in dare sul conto banca, un'uscita in avere;
+- si scrive l'importo, con attenzione a virgole e punti delle migliaia;
+- quando c'è, si collega la fattura che il movimento paga o incassa.
+
+Per un conto con poche decine di movimenti al mese il lavoro è sopportabile. Con più clienti, più conti e qualche estratto scansionato diventa una parte importante della giornata, e soprattutto è il punto in cui si infilano gli errori più difficili da trovare: un importo invertito, un movimento saltato tra una pagina e l'altra, una commissione registrata due volte.
+
+## Prima di importare: i controlli che non vanno saltati
+
+Che il file venga da un programma, da un collaboratore o dal sito della banca, prima di importarlo in prima nota conviene fare sempre gli stessi controlli. Una volta importati, i movimenti sbagliati si correggono uno per uno, quindi è meglio fermarli prima.
+
+- Il periodo è quello giusto: la prima e l'ultima data corrispondono all'estratto, senza movimenti del mese precedente già registrati.
+- Il numero di movimenti torna con il PDF.
+- Saldo iniziale più entrate meno uscite dà esattamente il saldo finale stampato dalla banca. Se manca anche un centesimo, c'è un movimento letto male o mancante.
+- Nessuna riga estranea: riporti, totali di pagina, saldi intermedi e intestazioni non devono finire tra i movimenti.
+- Le descrizioni sono complete, anche quando nel PDF andavano a capo su più righe. È la descrizione che permette di scegliere la contropartita giusta.
+
+Il controllo dei saldi è il più utile perché è oggettivo: o torna o non torna. Quando la banca stampa anche il saldo dopo ogni operazione, il controllo si può ripetere riga per riga e trovare subito il punto in cui qualcosa si è rotto.
+
+## Conto banca e contropartite
+
+Importare l'estratto conto in prima nota vuol dire, in pratica, trasformare ogni movimento in una registrazione a partita doppia con due conti. Uno dei due è sempre lo stesso: il conto della banca nel piano dei conti dello studio. L'altro dipende dal tipo di movimento.
+
+Qui sta il lavoro vero. Un bonifico ricevuto da un cliente va sul conto clienti o sul cliente specifico, un addebito SDD della luce su utenze, un F24 sui conti di imposte e contributi, il canone del conto e l'imposta di bollo su spese bancarie, uno spostamento tra due conti dello stesso intestatario su un conto transitorio o di giroconto. Ogni studio ha il proprio piano dei conti e le proprie abitudini, quindi non esiste una tabella valida per tutti.
+
+Per questo ha senso lavorare in due passaggi: prima si assegna a ogni movimento una categoria leggibile (stipendi, F24, utenze, fornitori, incassi da clienti), poi si associa una volta per tutte a ogni categoria il codice conto del proprio piano dei conti. Il mese successivo l'associazione è già pronta e resta solo da controllare i movimenti dubbi.
+
+## Il file da importare: cosa deve contenere
+
+La maggior parte dei programmi di contabilità permette di importare movimenti da un file di testo, spesso un CSV. Le regole cambiano da programma a programma, ma le informazioni richieste sono quasi sempre le stesse:
+
+- data di registrazione, e a volte data valuta;
+- conto dare e conto avere, oppure un solo conto e un importo con segno;
+- importo, con il separatore dei decimali che il programma si aspetta;
+- descrizione;
+- eventuale riferimento al documento, cioè la fattura pagata o incassata.
+
+Prima del primo import vale la pena controllare nel manuale del proprio gestionale tre dettagli che causano la maggior parte degli scarti: il separatore dei campi (punto e virgola, virgola o tabulazione), il formato della data e se la prima riga deve contenere le intestazioni delle colonne. Conviene anche fare una prova su un mese già registrato a mano, per confrontare il risultato prima di usarlo sul serio.
+
+## Come lo fa Estratti Conto
+
+Estratti Conto serve a preparare proprio questo file partendo dal PDF della banca, senza ribattere nulla:
+
+- si carica l'estratto conto PDF di qualsiasi banca italiana, anche scansionato, e i movimenti vengono separati con data, data valuta, descrizione completa e importo;
+- ogni estratto viene ricontrollato dal saldo iniziale al saldo finale, e riga per riga quando la banca stampa il saldo progressivo; i movimenti da verificare sono evidenziati;
+- a ogni movimento viene assegnata una categoria, che si può correggere con un clic prima di scaricare;
+- se si caricano anche le fatture elettroniche XML del periodo, i bonifici vengono abbinati alle fatture e il numero del documento finisce nel file.
+
+Per la prima nota si può scaricare un CSV con data, conto dare, conto avere, importo, descrizione e documento: le entrate vanno in dare sul conto banca e le uscite in avere. C'è poi un CSV configurabile per il gestionale, in cui si scelgono il tracciato (dare e avere oppure importo con segno), il separatore, il formato dei decimali e della data, la riga di intestazione, il nome del conto banca e il codice conto per ogni categoria. Le impostazioni restano salvate nel browser, così il mese dopo basta caricare il nuovo estratto.
+
+Il CSV non è il tracciato ufficiale di un gestionale specifico: è un file che si adatta alle regole di importazione del programma che usi. Se il tuo gestionale ha un formato particolare, puoi scriverci e indicarci quale usi.
+
+## Prova con il prossimo estratto
+
+Il modo più semplice per capire se fa per il tuo studio è provarlo su un estratto che devi comunque registrare. Puoi partire dall'estratto di esempio, senza caricare nulla, oppure usare un tuo PDF: ogni mese hai tre conversioni gratuite, senza registrarti. Controlla che i saldi tornino, imposta i codici conto una volta e scarica il file per la prima nota.`,
+  },
 ];
 
 export const articolo = (slug: string) => ARTICOLI.find((a) => a.slug === slug);
