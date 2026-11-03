@@ -153,6 +153,71 @@ Il CSV non è il tracciato ufficiale di un gestionale specifico: è un file che 
 
 Il modo più semplice per capire se fa per il tuo studio è provarlo su un estratto che devi comunque registrare. Puoi partire dall'estratto di esempio, senza caricare nulla, oppure usare un tuo PDF: ogni mese hai tre conversioni gratuite, senza registrarti. Controlla che i saldi tornino, imposta i codici conto una volta e scarica il file per la prima nota.`,
   },
+  {
+    slug: "riconciliazione-bancaria-fatture-elettroniche",
+    titolo: "Riconciliazione bancaria con le fatture elettroniche: come abbinare movimenti e fatture XML",
+    descrizione:
+      "Come si fa la riconciliazione bancaria con le fatture elettroniche: quali dati guardare in un bonifico e in un file XML, come gestire acconti e pagamenti cumulativi, e come trovare subito le fatture ancora aperte.",
+    parolaChiave: "riconciliazione bancaria fatture elettroniche",
+    data: "2026-11-03",
+    testo: `Con la fatturazione elettronica lo studio ha già tutte le fatture dei clienti in formato XML, attive e passive. Eppure, quando arriva l'estratto conto, la riconciliazione bancaria con le fatture elettroniche si fa ancora quasi sempre a occhio: si scorre la lista dei movimenti, si cerca la fattura corrispondente e si segna a mano cosa è stato pagato. In questa guida vediamo quali dati usare, dove nascono i casi difficili e come arrivare a un elenco chiaro di fatture pagate, parziali e ancora aperte.
+
+## Cosa vuol dire riconciliare banca e fatture
+
+Riconciliare significa collegare ogni movimento del conto alla fattura che paga o incassa, e di conseguenza sapere quali fatture risultano saldate e quali no. Il risultato serve a più cose: chiudere le partite di clienti e fornitori, preparare i solleciti, rispondere al cliente che chiede "quanto mi devono ancora", controllare che i pagamenti ai fornitori siano usciti davvero.
+
+Il lavoro manuale tipico è questo:
+
+- si apre l'estratto conto del mese e l'elenco delle fatture del periodo, spesso esportato dal cassetto fiscale o dal gestionale;
+- per ogni bonifico in entrata si cerca una fattura attiva con lo stesso importo, poi si controlla che il nome dell'ordinante corrisponda al cliente;
+- per ogni uscita si fa lo stesso con le fatture passive;
+- si annota la fattura abbinata accanto al movimento e si segna la fattura come pagata;
+- alla fine si fa l'elenco di ciò che non torna: movimenti senza fattura e fatture senza pagamento.
+
+## I dati che contano davvero
+
+Un abbinamento affidabile non si basa su un solo dato. Conviene ragionare su quattro elementi, in quest'ordine:
+
+- l'importo: deve coincidere con il totale del documento o con l'importo di una scadenza indicata nella fattura (le fatture elettroniche riportano le rate nei dati di pagamento);
+- il verso: un incasso si abbina a una fattura emessa, un pagamento a una fattura ricevuta. Sembra ovvio, ma due fatture con lo stesso importo, una attiva e una passiva, sono un caso frequente;
+- la causale: se riporta il numero della fattura, l'abbinamento è quasi certo. Spesso la causale contiene anche il nome della controparte;
+- la data: il pagamento arriva di solito dopo la fattura e vicino alla scadenza. Un bonifico mesi prima della data del documento è sospetto.
+
+Un importo identico da solo può bastare quando il numero di fatture è piccolo, ma con più clienti dello stesso settore le coincidenze diventano frequenti. Per questo vale la pena guardare sempre almeno un secondo elemento.
+
+## I casi che fanno perdere tempo
+
+La maggior parte dei movimenti si abbina in pochi secondi. Il tempo se ne va sui casi particolari:
+
+- acconti e rate: il cliente paga una parte della fattura, l'importo non coincide con nessun totale e bisogna ricordarsi che la fattura resta aperta per la differenza;
+- pagamenti cumulativi: un unico bonifico salda più fatture dello stesso fornitore o cliente, e la somma va ricostruita a mano;
+- causali vuote o generiche come "saldo fattura" o "pagamento", senza numero né riferimenti;
+- importi al netto di ritenute o abbuoni, che non corrispondono più al totale del documento;
+- note di credito che riducono quanto dovuto.
+
+Su questi casi nessun metodo automatico può essere sicuro al cento per cento, e non deve fingere di esserlo. L'obiettivo realistico è un altro: abbinare con certezza i casi chiari e mettere in evidenza quelli da guardare, invece di costringere a controllare tutto.
+
+## Riconciliazione bancaria con le fatture elettroniche in Estratti Conto
+
+Estratti Conto fa questo lavoro partendo da due cose che lo studio ha già: il PDF dell'estratto conto e i file XML delle fatture del periodo.
+
+- Si carica l'estratto conto PDF, di qualsiasi banca italiana e anche scansionato, insieme alle fatture XML. Indicando la partita IVA del cliente, ogni fattura viene riconosciuta come emessa o ricevuta, così gli incassi si confrontano solo con le fatture attive e i pagamenti solo con quelle passive.
+- Per ogni movimento si cercano le fatture con lo stesso importo del totale o di una scadenza. L'abbinamento diventa più sicuro se la causale contiene il numero della fattura o il nome della controparte e se la data è vicina alla fattura o alla scadenza. Per ogni abbinamento si vede il motivo.
+- Un pagamento più basso del totale viene abbinato come parziale solo quando la causale cita il numero della fattura. Una fattura può ricevere più pagamenti parziali finché non è coperta.
+- Ogni movimento viene usato una volta sola, e si parte dalle coppie più sicure.
+
+Il risultato è un elenco delle fatture con stato pagata, parziale o aperta, con l'importo già pagato e il residuo, e accanto a ogni movimento la fattura abbinata. Tutto finisce anche nel file Excel, in un foglio dedicato alle fatture, e il numero della fattura entra nel CSV per la prima nota.
+
+Prima dell'abbinamento, l'estratto viene ricontrollato dal saldo iniziale al saldo finale: se manca un movimento, lo si vede subito, invece di scoprirlo quando una fattura risulta aperta senza motivo.
+
+## Cosa resta da fare a mano
+
+Restano i casi che richiedono una decisione: il bonifico cumulativo da dividere, l'importo al netto della ritenuta, la causale che non dice nulla. Sono pochi rispetto al totale, ma è giusto che li guardi chi conosce il cliente. Lo strumento li lascia senza abbinamento invece di indovinare, così l'elenco delle fatture aperte resta affidabile.
+
+## Provalo con le fatture di un mese
+
+Il modo più semplice per valutarlo è usare un mese che hai già riconciliato a mano e confrontare il risultato. Puoi anche partire dall'esempio, che contiene un estratto conto e alcune fatture XML, senza caricare nulla. Ogni mese hai tre conversioni gratuite, senza registrarti: carica l'estratto e le fatture, controlla gli abbinamenti e scarica il file.`,
+  },
 ];
 
 export const articolo = (slug: string) => ARTICOLI.find((a) => a.slug === slug);
